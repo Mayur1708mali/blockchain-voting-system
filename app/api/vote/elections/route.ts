@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { closeExpiredElections } from "@/lib/close-expired-elections";
+import { activateScheduledElections } from "@/lib/activate-scheduled-elections";
 
 // GET: List elections available to the current voter
 export async function GET() {
@@ -11,6 +13,10 @@ export async function GET() {
   }
 
   try {
+    // Auto-activate scheduled elections and close expired ones
+    await activateScheduledElections();
+    await closeExpiredElections();
+
     // Get elections where voter has been approved
     const voterApprovals = await prisma.voterApproval.findMany({
       where: { userId: session.user.id, approved: true },
