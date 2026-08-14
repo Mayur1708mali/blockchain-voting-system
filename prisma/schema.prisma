@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  VOTER
+  SUPER_ADMIN
+  ELECTION_MANAGER
+  AUDITOR
+}
+
+enum ElectionType {
+  SINGLE_CHOICE
+  MULTI_CHOICE
+}
+
+enum ElectionStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String
+  name             String
+  role             Role      @default(VOTER)
+  approved         Boolean   @default(false)
+  walletAddress    String?
+  walletPrivateKey String?   // Encrypted
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  elections        Election[]      @relation("CreatedElections")
+  voterApprovals   VoterApproval[]
+}
+
+model Election {
+  id              String         @id @default(cuid())
+  title           String
+  description     String?
+  type            ElectionType   @default(SINGLE_CHOICE)
+  status          ElectionStatus @default(DRAFT)
+  startDate       DateTime
+  endDate         DateTime
+  contractAddress String?
+  onChainId       Int?           // The election ID used on the smart contract
+  createdById     String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  createdBy       User           @relation("CreatedElections", fields: [createdById], references: [id])
+  candidates      Candidate[]
+  voterApprovals  VoterApproval[]
+}
+
+model Candidate {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  candidateIndex Int      // Index used on-chain
+  electionId     String
+  createdAt      DateTime @default(now())
+
+  election       Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+}
+
+model VoterApproval {
+  id         String   @id @default(cuid())
+  userId     String
+  electionId String
+  approved   Boolean  @default(true)
+  assignedAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, electionId])
+}
