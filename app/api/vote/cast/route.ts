@@ -4,12 +4,26 @@ import { prisma } from "@/lib/prisma";
 import { voteSchema } from "@/lib/validations";
 import { getContract, getVoterWallet } from "@/lib/blockchain";
 import { decrypt } from "@/lib/encryption";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   const session = await auth();
 
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit: 3 vote attempts per minute per user
+  const { success } = rateLimit(`vote:${session.user.id}`, {
+    windowMs: 60 * 1000,
+    maxRequests: 3,
+  });
+
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many vote attempts. Please wait and try again." },
+      { status: 429 }
+    );
   }
 
   const role = (session.user as any).role;
