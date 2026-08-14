@@ -5,6 +5,7 @@ import { voteSchema } from "@/lib/validations";
 import { getContract, getVoterWallet } from "@/lib/blockchain";
 import { decrypt } from "@/lib/encryption";
 import { rateLimit } from "@/lib/rate-limit";
+import { closeExpiredElections } from "@/lib/close-expired-elections";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -59,6 +60,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Election not found" },
         { status: 404 }
+      );
+    }
+
+    // Auto-close if the election's end date has passed
+    if (election.status === "ACTIVE" && new Date(election.endDate) <= new Date()) {
+      await closeExpiredElections();
+      return NextResponse.json(
+        { error: "Election has ended" },
+        { status: 400 }
       );
     }
 

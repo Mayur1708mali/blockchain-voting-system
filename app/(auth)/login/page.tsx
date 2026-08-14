@@ -29,7 +29,22 @@ export default function LoginPage() {
         toast.error("Invalid email or password");
       } else {
         toast.success("Login successful!");
-        router.push("/");
+        // Fetch session to determine redirect based on role
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const role = session?.user?.role;
+
+        if (role === "VOTER") {
+          if (!session?.user?.approved) {
+            router.push("/pending-approval");
+          } else {
+            router.push("/vote");
+          }
+        } else if (["SUPER_ADMIN", "ELECTION_MANAGER", "AUDITOR"].includes(role)) {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
         router.refresh();
       }
     } catch (error) {

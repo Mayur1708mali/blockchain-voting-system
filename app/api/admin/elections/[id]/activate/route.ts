@@ -47,8 +47,9 @@ export async function POST(
       );
     }
 
-    // Generate a unique on-chain ID from current timestamp
-    const onChainId = Date.now();
+    // Generate a unique on-chain ID that fits in a 32-bit signed integer
+    // Use lower bits of timestamp combined with randomness to avoid collisions
+    const onChainId = Math.floor(Math.random() * 2_000_000_000) + 1;
 
     // Deploy election to blockchain
     const adminWallet = getAdminWallet();

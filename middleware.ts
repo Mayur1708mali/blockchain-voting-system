@@ -7,11 +7,33 @@ export default auth((req) => {
 
   // Public routes - no auth required
   if (
-    pathname === "/" ||
     pathname === "/login" ||
     pathname === "/register" ||
+    pathname === "/pending-approval" ||
     pathname.startsWith("/api/auth")
   ) {
+    return NextResponse.next();
+  }
+
+  // Home page - redirect authenticated users to their dashboard
+  if (pathname === "/") {
+    if (user) {
+      const role = user.role;
+      if (role === "VOTER") {
+        if (!user.approved) {
+          return NextResponse.redirect(new URL("/pending-approval", req.url));
+        }
+        return NextResponse.redirect(new URL("/vote", req.url));
+      }
+      if (["SUPER_ADMIN", "ELECTION_MANAGER", "AUDITOR"].includes(role)) {
+        return NextResponse.redirect(new URL("/admin", req.url));
+      }
+    }
+    return NextResponse.next();
+  }
+
+  // Election results pages are public
+  if (pathname.startsWith("/elections/") && pathname.endsWith("/results")) {
     return NextResponse.next();
   }
 
