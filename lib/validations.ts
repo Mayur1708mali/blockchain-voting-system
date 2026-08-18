@@ -3,6 +3,10 @@ import { z } from "zod";
 export const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  prn: z
+    .string()
+    .regex(/^\d{16}$/, "PRN must be exactly 16 digits"),
+  class: z.string().min(1, "Class is required"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

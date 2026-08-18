@@ -30,6 +30,8 @@ model User {
   email            String    @unique
   password         String
   name             String
+  prn              BigInt    @unique
+  class            String
   role             Role      @default(VOTER)
   approved         Boolean   @default(false)
   walletAddress    String?
