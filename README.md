@@ -26,7 +26,7 @@ A tamper-proof, transparent, blockchain-based voting system built with Next.js, 
 ## Prerequisites
 
 - Node.js v18+
-- PostgreSQL database
+- Docker (for PostgreSQL)
 - npm
 
 ## Getting Started
@@ -44,40 +44,68 @@ cd blockchain && npm install && cd ..
 
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your PostgreSQL connection string
 ```
 
-### 3. Set up the database
+The default `.env.local` uses the Docker PostgreSQL connection string:
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/voting_system"
+```
+ 
+### 3. Start PostgreSQL with Docker
+ 
+```bash
+docker compose up -d
+```
+ 
+This starts a PostgreSQL 16 container on port `5432`. Verify it's running:
+ 
+```bash
+docker port voting-system-db
+# Should show: 5432/tcp -> 0.0.0.0:5432
+```
+ 
+### 4. Set up the database
 
 ```bash
 npx prisma db push
 npx prisma db seed
 ```
 
-This creates the tables and seeds a default admin account:
+This creates the tables and seeds default admin account:
 - Email: `admin@voting.com`
 - Password: `admin123`
 
-### 4. Start the blockchain (terminal 1)
+###5. Start the blockchain (terminal 1)
 
 ```bash
 npm run blockchain:node
 ```
 
-### 5. Deploy the smart contract (terminal 2)
+### 6. Deploy the smart contract (terminal 2)
 
 ```bash
 npm run blockchain:compile
 npm run blockchain:deploy
 ```
 
-### 6. Start the app (terminal 2)
+### 7. Start the app (terminal 2)
 
 ```bash
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000)
+### Stopping the database
+ 
+```bash
+docker compose down
+```
+ 
+To remove stored data as well:
+ 
+```bash
+docker compose down -v
+```
 
 ## Available Scripts
 
