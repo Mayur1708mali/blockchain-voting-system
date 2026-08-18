@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 interface Voter {
@@ -192,7 +193,12 @@ export default function VotersPage() {
               {voters.map((voter) => (
                 <tr key={voter.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {voter.name}
+                    <Link
+                      href={`/admin/voters/${voter.id}`}
+                      className="text-indigo-600 hover:text-indigo-800 hover:underline"
+                    >
+                      {voter.name}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {voter.email}
