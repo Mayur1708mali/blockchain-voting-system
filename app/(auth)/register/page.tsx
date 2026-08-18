@@ -11,6 +11,8 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    prn: "",
+    class: "",
     password: "",
     confirmPassword: "",
   });
@@ -32,6 +34,8 @@ export default function RegisterPage() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          prn: formData.prn,
+          class: formData.class,
           password: formData.password,
         }),
       });
@@ -102,6 +106,48 @@ export default function RegisterPage() {
                 }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
                 placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="prn"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                PRN Number
+              </label>
+              <input
+                id="prn"
+                type="text"
+                required
+                maxLength={16}
+                value={formData.prn}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setFormData({ ...formData, prn: value });
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                placeholder="16-digit PRN number"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="class"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Class
+              </label>
+              <input
+                id="class"
+                type="text"
+                required
+                value={formData.class}
+                onChange={(e) =>
+                  setFormData({ ...formData, class: e.target.value })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                placeholder="e.g. TY-CSE-A"
               />
             </div>
 

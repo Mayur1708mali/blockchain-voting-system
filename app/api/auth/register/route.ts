@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, password } = validation.data;
+    const { name, email, prn, class: userClass, password } = validation.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -44,6 +44,18 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if PRN already exists
+    const existingPrn = await prisma.user.findUnique({
+      where: { prn: BigInt(prn) },
+    });
+
+    if (existingPrn) {
+      return NextResponse.json(
+        { error: "An account with this PRN already exists" },
+        { status: 409 }
+      );
+    }
+
     // Hash password
     const hashedPassword = await bcryptjs.hash(password, 12);
 
@@ -52,6 +64,8 @@ export async function POST(request: Request) {
       data: {
         name,
         email,
+        prn: BigInt(prn),
+        class: userClass,
         password: hashedPassword,
       },
     });
