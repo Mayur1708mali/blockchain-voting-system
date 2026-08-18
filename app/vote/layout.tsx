@@ -21,6 +21,12 @@ export default function VoteLayout({ children }: { children: React.ReactNode }) 
             >
               Verify My Vote
             </Link>
+            <Link
+              href="/profile"
+              className="text-sm text-gray-600 hover:text-indigo-600"
+            >
+              My Profile
+            </Link>
             <span className="text-sm text-gray-500">
               {session?.user?.name}
             </span>
