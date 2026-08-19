@@ -93,6 +93,24 @@ export default function VoterDetailPage() {
     }
   };
 
+  const handleFundWallet = async () => {
+    if (!confirm("Fund this voter's wallet with 0.1 ETH?")) return;
+
+    try {
+      const res = await fetch(`/api/admin/voters/${params.id}/fund`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Wallet funded successfully!");
+      } else {
+        toast.error(data.error);
+      }
+    } catch {
+      toast.error("Failed to fund wallet");
+    }
+  };
+
   if (loading || !voter) {
     return (
       <div className="animate-pulse space-y-4">
@@ -209,9 +227,17 @@ export default function VoterDetailPage() {
       {/* Wallet Info */}
       {voter.walletAddress && (
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-            Blockchain Wallet
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Blockchain Wallet
+            </h3>
+            <button
+              onClick={handleFundWallet}
+              className="px-3 py-1.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
+            >
+              Fund Wallet (0.1 ETH)
+            </button>
+          </div>
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-xs font-medium text-gray-500 uppercase mb-1">
               Wallet Address
