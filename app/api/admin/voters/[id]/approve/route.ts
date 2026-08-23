@@ -51,9 +51,15 @@ export async function PATCH(
     let fundingTx = "";
     try {
       fundingTx = await fundWallet(wallet.address, "0.1");
-    } catch (error) {
-      // If blockchain isn't running, still approve but note the issue
-      console.warn("Could not fund wallet - blockchain may not be running");
+    } catch (error: any) {
+      console.error("Wallet funding failed:", error.message);
+      return NextResponse.json(
+        {
+          error:
+            "Failed to fund voter wallet. Make sure the Hardhat node is running and the admin wallet has funds.",
+        },
+        { status: 503 }
+      );
     }
 
     // Update user
